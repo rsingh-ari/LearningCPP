@@ -1,0 +1,66 @@
+# depslib dependency file v1.0
+1485314298 source:f:\intervewqusetions\dummyproject\mainfile.cpp.cpp
+	<iostream>
+	<string.h>
+	<array>
+	<tuple>
+	<vector>
+	"learnDataStructure.h"
+
+1485314629 source:f:\intervewqusetions\dummyproject\learndatastructure.cpp
+	"learnDataStructure.h"
+
+1485315048 f:\intervewqusetions\dummyproject\learndatastructure.h
+	<iostream>
+	<array>
+	<vector>
+	<string>
+
+1485323244 source:d:\d-drive\xyz-data\yzdata\dummyproject\mainfile.cpp.cpp
+	<iostream>
+	<string.h>
+	<array>
+	<tuple>
+	<vector>
+	<list>
+	<map>
+	"learnDataStructure.h"
+
+1486544074 d:\d-drive\xyz-data\yzdata\dummyproject\learndatastructure.h
+	<iostream>
+	<array>
+	<vector>
+	<string>
+
+1486709833 source:d:\d-drive\xyz-data\yzdata\dummyproject\learndatastructure.cpp
+	"learnDataStructure.h"
+
+1486641982 source:d:\d-drive\xyz-data\yzdata\dummyproject\mainfile.cpp
+	<iostream>
+	<string.h>
+	<array>
+	<tuple>
+	<vector>
+	<list>
+	<map>
+	"learnDataStructure.h"
+
+1487053540 source:d:\backup-data\d-drive\xyz-data\yzdata\dummyproject\mainfile.cpp
+	<iostream>
+	<string.h>
+	<array>
+	<tuple>
+	<vector>
+	<list>
+	<map>
+	"learnDataStructure.h"
+
+1486544076 d:\backup-data\d-drive\xyz-data\yzdata\dummyproject\learndatastructure.h
+	<iostream>
+	<array>
+	<vector>
+	<string>
+
+1487053528 source:d:\backup-data\d-drive\xyz-data\yzdata\dummyproject\learndatastructure.cpp
+	"learnDataStructure.h"
+
