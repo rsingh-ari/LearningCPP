@@ -1,0 +1,504 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdarg.h>
+#include<stdlib.h>
+#include<math.h>
+#include<dirent.h>
+#include"sqlinsert.h"
+#include"file_parser.h"
+#include"plotgraph.h"
+#include"debug.h"
+#define DIR_NAME 10
+#define FULL_PATH 100
+#define FILE_PFIX_LEN 10
+#define FULL_FILE_NAME 50
+#define MAX_SPACE 15
+#define MAX_LEN_NUM 25
+#define MAX_GAS_SOURCE 4
+//int flag1=1,flag2=1,flag3=1,flag4=1;
+short int record_to_insert;
+int calib_data_key;
+char *gas_src[MAX_GAS_SOURCE] = {"Zero Air","Calibrant 1","Calibrant 2","Calibrant 3"};
+float Nmh4ppm[]={0,2.058,10,100.2};
+//char *mob_concentration[]={"0.011047064","2.057707459","9.993055341","100.2002953"};
+float SD[] = {0.0};
+
+double zero_air_values[150],ch4_2ppm_values[150],ch4_10ppm_values[150],ch4_100ppm_values[150];
+float calib_val_total[MAX_GAS_SOURCE]={0.0};
+float calib_db_values[MAX_GAS_SOURCE]={0.0};
+int total_val_per_calib[MAX_GAS_SOURCE];
+enum file_enum
+{
+        zero_air,
+        ch4_2ppm,
+        ch4_10ppm,
+        ch4_100ppm
+};
+void fill_values(char* rval[],int data_sets, ...);
+float stof(const char* s);
+int print_dir()
+{
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir ("/home/labuser1/Ashok")) != NULL) {
+  	/* print all the files and directories within directory */
+  	while ((ent = readdir (dir)) != NULL) {
+#if DEBUG
+    	print("%s\n", ent->d_name);
+#endif
+  	}
+  	closedir (dir);
+	} else {
+  	/* could not open directory */
+  	perror ("");
+  	return -1;
+	}
+}
+void get_filename(char* file_name,int index)
+{
+	char file_prefix[FILE_PFIX_LEN]="NBDS2039-";
+	char *file_posfix[4]={"-zero_air","-ch4_2ppm","-ch4_10ppm","-ch4_100ppm"};	
+	char dir_name[DIR_NAME]="20170222";
+	//int len=0;
+	//char file_name[FULL_FILE_NAME];
+	/* file name*/
+	strcpy(file_name,file_prefix);
+	strcat(file_name,dir_name);
+	strcat(file_name,file_posfix[index]);
+	strcat(file_name,".dat");
+	//print("file_name11 = %s\n",file_name);
+}
+void split_string(char *path,char* fname)
+{
+	int len1,len2;
+	len1 = strlen(path);
+	len2 = strlen(fname);
+	memset((path+(len1-len2)),'\0',len1);
+	//full_path = strstr(full_path,"/home/labuser1/Ashok/project/");
+	//print("path=%s\tlen=%d\n",path,len1);
+	
+}
+int get_ch4_ppm_update_db()
+{
+	FILE *fp1,*fp2,*fp3,*fp4;
+	char *dir_path = "/home/labuser1/Ashok/project/";
+	char dir_name[DIR_NAME]="20170222/";
+	int len=0,i=0;
+	char file_name[FULL_FILE_NAME];
+	char full_path[FULL_PATH];
+	float avg[MAX_GAS_SOURCE]={0.0};
+	//enum file_enum type;
+	memset(full_path,'\0',FULL_PATH);
+	memset(full_path,'\0',FULL_FILE_NAME);
+	//print("dir_name=%s\n",dir_name);
+	/* dir name and file name */
+	strcpy(full_path,dir_path);
+	strcat(full_path,dir_name);
+	get_filename(file_name,zero_air);
+	strcat(full_path,file_name);
+	/*openning file one*/
+#if DEBUG
+	printf("full_path=%s\n",full_path);
+#endif
+	fp1 = fopen(full_path,"r+");
+	if(!fp1)
+	{
+#if DEBUG
+		printf("file %s not opened\n",file_name);
+#endif
+	}
+
+	split_string(full_path,file_name);
+	get_filename(file_name,ch4_2ppm);
+	strcat(full_path,file_name);
+	//printf("full_path=%s\n",full_path);
+	/*openning file two*/
+	fp2 = fopen(full_path,"r+");
+	if(!fp2)
+	{
+#if DEBUG
+		printf("file %s not opened\n",file_name);
+#endif
+	}
+
+	split_string(full_path,file_name);
+	get_filename(file_name,ch4_10ppm);
+	strcat(full_path,file_name);
+	//print("full_path=%s\n",full_path);
+	/*openning file two*/
+	fp3 = fopen(full_path,"r+");
+	if(!fp2)
+	{
+#if DEBUG
+		printf("file %s not opened\n",file_name);
+#endif
+	}
+
+	split_string(full_path,file_name);
+	get_filename(file_name,ch4_100ppm);
+	strcat(full_path,file_name);
+#if DEBUG
+	//printf("full_path=%s\n",full_path);
+#endif
+	/*openning file two*/
+	fp4 = fopen(full_path,"r+");
+	if(!fp2)
+	{
+#if DEBUG
+		printf("file %s not opened\n",file_name);
+#endif
+	}
+	
+	
+	{
+	char *p1,*p2,*p3,*p4;
+	char buf1[256],buf2[256],buf3[256],buf4[256],*buf5[4];
+	memset(buf1,'\0',sizeof(buf1));
+	memset(buf2,'\0',sizeof(buf2));
+	memset(buf3,'\0',sizeof(buf3));
+	memset(buf4,'\0',sizeof(buf4));
+	//while((fgetc(fp1)!=EOF) || (fgetc(fp2)!=EOF) || (fgetc(fp3)!=EOF) || (fgetc(fp4)!=EOF))
+	while( p1!=NULL
+		|| p2!=NULL 
+		|| p3!=NULL 
+		|| p4!=NULL)
+		{
+			p1=fgets(buf1,sizeof(buf1),fp1);
+			p2=fgets(buf2,sizeof(buf2),fp2);
+			p3=fgets(buf3,sizeof(buf3),fp3);
+			p4=fgets(buf4,sizeof(buf4),fp4);
+			buf5[0]=p1;
+			buf5[1]=p2;
+			buf5[2]=p3;
+			buf5[3]=p4;
+			if(p1!=NULL || p2!=NULL || p3!=NULL || p4!=NULL)
+				fill_values(buf5,4,buf1,buf2,buf3,buf4);
+			//printf("%s\n",buf1);
+			//printf("%s\n",buf2);
+			//printf("%s\n",buf3);
+			///printf("%s\n",buf4);
+			//printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++i=%d\n",i++);
+		}
+	}
+
+	for(i=0;i<MAX_GAS_SOURCE;i++)
+	{
+	avg[i]=(float)(calib_val_total[i]/total_val_per_calib[i]);
+#if DEBUG
+	//print("f_val[%d]=%f\tcnt[%d]=%d\tavg[%d]=%f\n",i,f_val[i],i,cnt[i],i,avg[i]);
+#endif
+	}
+	calculate_SD(avg);
+	for(i=0;i<MAX_GAS_SOURCE;i++)
+	{
+	insert_gas_table((void*)(unsigned long long)get_dta_base(),gas_src[i],Nmh4ppm[i],avg[i],SD[i]);	
+	}
+        //draw_graph(avg,Nmh4ppm,4);
+        plot_graph(Nmh4ppm,avg,4);
+	sleep(1);
+	generate_pdf(gas_src,avg,Nmh4ppm,SD,4);
+	//print_values();
+ 	insert_user_data((void*)(unsigned long long)get_dta_base(),"ChandanSingh","abc123","chandansingharicentcom");
+ 	insert_user_data((void*)get_dta_base(),"ashokphour","abc123","ashokphouraricentcom");
+ 	insert_user_data((void*)get_dta_base(),"RajMangal","abc123","rajmangalaricentcom");
+ 	insert_user_data((void*)get_dta_base(),"AsharAli","abc123","asharaliaricentcom");
+	//db_delete_user((void*)(unsigned long long)get_dta_base(),"ChandanSingh","ksdhcksdhck");
+ 	insert_user_data((void*)get_dta_base(),"ChandanSingh","abc@#$123","chandansingharicentcom");
+	//print_dir();
+	return 0;
+}
+
+void fill_values(char* rval[],int data_sets, ...)
+{
+	static int count=0;
+	va_list ap;
+	int i=0,val;
+	int cont1=0,cont2=0,cont3=0,cont4=0;
+	char* buf[4];
+	va_start(ap,data_sets);
+	for(i=0;i<data_sets;i++)
+		{
+		buf[i] = va_arg(ap,char*);
+		}
+	va_end(ap);
+	if(rval[zero_air]== NULL)
+		{
+		calib_db_values[zero_air]=0.0;
+		record_to_insert++;
+#if DEBUG
+		//print("%p\tcnt=%d\n",rval[0],cnt[0]);
+#endif
+		}
+	if(rval[ch4_2ppm]== NULL)
+		{
+		calib_db_values[ch4_2ppm]=0.0;
+		record_to_insert++;
+#if DEBUG
+		//print("%p\tcnt=%d\n",rval[0],cnt[0]);
+#endif
+		}
+	if(rval[ch4_10ppm]== NULL)
+		{
+		calib_db_values[ch4_10ppm]=0.0;
+		record_to_insert++;
+#if DEBUG
+		//print("%p\tcnt=%d\n",rval[0],cnt[0]);
+#endif
+		}
+	if(rval[ch4_100ppm]== NULL)
+		{
+		calib_db_values[ch4_100ppm]=0.0;
+		record_to_insert;
+#if DEBUG
+		//print("%p\tcnt=%d\n",rval[0],cnt[0]);
+#endif
+		}
+	if(count>0)
+	{
+		char ch1=1,ch2=1,ch3=1,ch4=1;
+		i=0;
+		while(ch1!='\0' || ch2!='\0' || ch3!='\0' || ch4!='\0')
+		{
+		   if(ch1 !='\0' )
+		   {
+			ch1 = buf[zero_air][i];
+			if(ch1 == ' '  )
+			{
+			    cont1++;
+			}
+		   }
+		  if(ch2 !='\0' )
+		   {
+			ch2 = buf[ch4_2ppm][i];
+			if(ch2 == ' ' )
+			{
+			    cont2++;
+			}
+		   }
+		if(ch3 !='\0' )
+		   {
+			ch3 = buf[ch4_10ppm][i];
+			if(ch3 == ' ' )
+			{
+			    cont3++;
+			}
+		   }
+		if(ch4 !='\0' )
+		   {
+			ch4 = buf[ch4_100ppm][i];
+			if(ch4 == ' ' )
+			{
+			    cont4++;
+			}
+		   }
+		   i++;
+		   if(cont1 == MAX_SPACE)
+		   {
+			char *tmp = (char*)malloc(sizeof(char)*MAX_LEN_NUM);
+			memset(tmp,'\0',MAX_LEN_NUM);
+			int j=0,k=0;
+			float d=0;
+			j=i;
+			while(buf[zero_air][j] != ' ')
+				{
+				 tmp[k]= buf[zero_air][j];
+				 j++;
+				 k++;
+				}
+
+				calib_db_values[zero_air] =stof(tmp);
+				calib_val_total[zero_air] +=calib_db_values[zero_air];	
+				zero_air_values[total_val_per_calib[zero_air]] = calib_db_values[zero_air];
+				//print("d=%f\n",d);
+				//sscanf(tmp,"%lf",&d);
+				//print("str=%s\n",tmp);
+				cont1=0;
+				record_to_insert++;
+				//insert_zero_air_data((void*)get_dta_base(),cnt[0],f_val[0]);
+				total_val_per_calib[zero_air] =total_val_per_calib[zero_air]+1;
+				free(tmp);
+		   }
+		   if(cont2 == MAX_SPACE)
+		   {
+			char *tmp = (char*)malloc(sizeof(char)*MAX_LEN_NUM);
+			memset(tmp,'\0',MAX_LEN_NUM);
+			int j=0,k=0;
+			//float d=0;
+			j=i;
+			while(buf[ch4_2ppm][j] != ' ')
+				{
+				 tmp[k]= buf[ch4_2ppm][j];
+				 j++;
+				 k++;
+				}
+				calib_db_values[ch4_2ppm] =stof(tmp);
+				calib_val_total[ch4_2ppm] +=calib_db_values[ch4_2ppm];
+				ch4_2ppm_values[total_val_per_calib[ch4_2ppm]] = calib_db_values[ch4_2ppm];
+				//print("d=%f\n",d);
+				//sscanf(tmp,"%lf",&d);
+				//print("str=%s\n",tmp);
+				cont2=0;
+				record_to_insert++;
+				//insert_ch4_2ppm_data((void*)get_dta_base(),cnt[1],f_val[1]);
+				//print("cnt=%d\n",cnt[1]);
+				total_val_per_calib[ch4_2ppm] =total_val_per_calib[ch4_2ppm]+1;
+				free(tmp);
+		   }
+		   if(cont3 == MAX_SPACE)
+		   {
+			char *tmp = (char*)malloc(sizeof(char)*MAX_LEN_NUM);
+			memset(tmp,'\0',MAX_LEN_NUM);
+			int j=0,k=0;
+			//float d=0;
+			j=i;
+			while(buf[ch4_10ppm][j] != ' ')
+				{
+				 tmp[k]= buf[ch4_10ppm][j];
+				 j++;
+				 k++;
+				}
+				calib_db_values[ch4_10ppm] =stof(tmp);
+				calib_val_total[ch4_10ppm] += calib_db_values[ch4_10ppm];
+				ch4_10ppm_values[total_val_per_calib[ch4_10ppm]] = calib_db_values[ch4_10ppm];
+				//print("d=%f\n",d);
+				//sscanf(tmp,"%lf",&d);
+				//print("str=%s\n",tmp);
+				cont3=0;
+				record_to_insert++;
+				//insert_ch4_10ppm_data((void*)get_dta_base(),cnt[2],f_val[2]);
+				total_val_per_calib[ch4_10ppm] =total_val_per_calib[ch4_10ppm]+1;
+				free(tmp);
+		   }
+		   if(cont4 == MAX_SPACE)
+		   {
+			char *tmp = (char*)malloc(sizeof(char)*MAX_LEN_NUM);
+			memset(tmp,'\0',MAX_LEN_NUM);
+			int j=0,k=0;
+			//float d=0;
+			j=i;
+			while(buf[ch4_100ppm][j] != ' ')
+				{
+				 tmp[k]= buf[ch4_100ppm][j];
+				 j++;
+				 k++;
+				}
+				calib_db_values[ch4_100ppm] =stof(tmp);
+				calib_val_total[ch4_100ppm] +=calib_db_values[ch4_100ppm];
+				ch4_100ppm_values[total_val_per_calib[ch4_100ppm]] = calib_db_values[ch4_100ppm];
+				//print("d=%f\n",d);
+				//sscanf(tmp,"%lf",&d);
+				//print("str=%s\n",tmp);
+				cont4=0;
+				record_to_insert++;
+				//insert_ch4_100ppm_data((void*)get_dta_base(),cnt[3],f_val[3]);
+				total_val_per_calib[ch4_100ppm] =total_val_per_calib[ch4_100ppm]+1;
+				free(tmp);
+		   }
+			
+		   if(record_to_insert == MAX_GAS_SOURCE)
+			{
+			record_to_insert=0;
+			calib_data_key++;
+		        //insert_zero_air_data((void*)(unsigned long long)get_dta_base(),calib_data_key,calib_db_values);
+			}
+		   if(rval[zero_air]==NULL && ch1!='\0'){
+		   	ch1='\0';
+		   }
+		   if(rval[ch4_2ppm]==NULL && ch2!='\0'){
+		   	ch2='\0';
+		   }
+		   if(rval[ch4_10ppm]==NULL && ch3!='\0'){
+		   	ch3='\0';
+		   } 
+		   if(rval[ch4_100ppm]==NULL && ch4!='\0'){
+		   	ch4='\0';
+		   }
+		}
+	}
+	count++;
+	
+}
+
+float stof(const char* s)
+{
+  int point_seen,d;
+  float rez = 0, fact = 1;
+  if (*s == '-'){
+    s++;
+    fact = -1;
+  };
+  for (point_seen = 0; *s; s++){
+    if (*s == '.'){
+      point_seen = 1;
+      continue;
+    };
+     d = *s - '0';
+    if (d >= 0 && d <= 9){
+      if (point_seen) fact /= 10.0f;
+      rez = rez * 10.0f + (float)d;
+    };
+  };
+  return rez * fact;
+}
+void print_values()
+{
+	int i;
+	for(i=0;i<150;i++)
+		printf("index=%d\tzero=%lf\t2ppm=%lf\t10ppm=%lf\t100ppm=%lf\n",i,zero_air_values[i],ch4_2ppm_values[i],ch4_10ppm_values[i],ch4_100ppm_values[i]);
+}
+float square(float b)
+{
+    float z;
+    z = b*b;
+    //printf("%f %f",z ,b);
+    return(z);
+}
+void calculate_SD(float avg[])
+{
+	int i;
+	float diff=0.0,sqr_sum=0.0;
+	for(i=0;i<total_val_per_calib[zero_air];i++)
+	{
+		diff = zero_air_values[i]-avg[zero_air];
+		if(diff < 0)
+		  diff = fabsf(diff);
+		sqr_sum += square(diff);
+	}
+	SD[zero_air] = sqrt(sqr_sum/total_val_per_calib[zero_air]);
+	diff=0.0;	
+	sqr_sum=0.0;
+	for(i=0;i<total_val_per_calib[ch4_2ppm];i++)
+	{
+		diff = ch4_2ppm_values[i]-avg[ch4_2ppm];
+		if(diff < 0)
+		  diff = fabsf(diff);
+		sqr_sum += square(diff);
+	}
+	SD[ch4_2ppm] = sqrt(sqr_sum/total_val_per_calib[ch4_2ppm]);	
+	diff=0.0;	
+	sqr_sum=0.0;
+
+	for(i=0;i<total_val_per_calib[ch4_10ppm];i++)
+	{
+		diff = ch4_10ppm_values[i]-avg[ch4_10ppm];
+		if(diff < 0)
+		  diff = fabsf(diff);
+		sqr_sum += square(diff);
+	}
+	SD[ch4_10ppm] = sqrt(sqr_sum/total_val_per_calib[ch4_10ppm]);	
+	diff=0.0;	
+	sqr_sum=0.0;
+
+	for(i=0;i<total_val_per_calib[ch4_100ppm];i++)
+	{
+		diff = ch4_100ppm_values[i]-avg[ch4_100ppm];
+		if(diff < 0)
+		  diff = fabsf(diff);
+		sqr_sum += square(diff);
+	}
+	SD[ch4_100ppm] = sqrt(sqr_sum/total_val_per_calib[ch4_100ppm]);
+#if DEBUG	
+	for(i=0;i<4;++i)
+		printf("sd=%f\tavg=%f\n",SD[i],avg[i]);
+#endif
+}
