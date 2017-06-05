@@ -64,3 +64,35 @@
 1487053528 source:d:\backup-data\d-drive\xyz-data\yzdata\dummyproject\learndatastructure.cpp
 	"learnDataStructure.h"
 
+1487053528 source:d:\soft\learningcpp\dummyproject\learndatastructure.cpp
+	"learnDataStructure.h"
+
+1486544076 d:\soft\learningcpp\dummyproject\learndatastructure.h
+	<iostream>
+	<array>
+	<vector>
+	<string>
+
+1496648412 source:d:\soft\learningcpp\dummyproject\mainfile.cpp
+	<iostream>
+	<string.h>
+	<array>
+	<tuple>
+	<vector>
+	<list>
+	<map>
+	"learnDataStructure.h"
+	"learnSTL.h"
+
+1496647885 d:\soft\learningcpp\dummyproject\learnstl.h
+	<iostream>
+	<string.h>
+	<array>
+	<tuple>
+	<vector>
+	<list>
+	<map>
+
+1496647881 source:d:\soft\learningcpp\dummyproject\learnstl.cpp
+	"learnSTL.h"
+

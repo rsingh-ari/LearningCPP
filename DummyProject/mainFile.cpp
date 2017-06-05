@@ -6,6 +6,7 @@
 #include <list>
 #include <map>
 #include "learnDataStructure.h"
+#include "learnSTL.h"
 
 struct doubleStruct
 {
@@ -167,6 +168,15 @@ int main() {
     {
         cout<<"\n ExpNumber = "<<expNum;
     }
+
+    try {
+        cout<<"In 2nd Try Block";
+        throw 10.5;
+    }
+    catch (...)
+    {
+        cout<<"\n Without param catch ExpNumber = ";
+    }
     //A o1,o2,o3(3,4);
     // your code goes here
     //a = 5;
@@ -184,93 +194,14 @@ int main() {
     //cin>>s1;
     //cout<<s1;
     mainTeraDost(o1, s1);
-    array <int, 5> arrayList1 = {1,2,3,4,5};
-    array <int, 5> arrayList2 = {6,7,8,9,0};
-    arrayList1.swap(arrayList2);
-    //arrayList1.fill(9.9);
-    cout<<" \n\narrayList1 value at position = "<<arrayList1.at(4)<<"\n";
-    cout<<" \n\narrayList1 value at position = "<<arrayList1.size();
-    cout<<" \n\narrayList2 value at position = "<<arrayList2.at(4)<<"\n";
-    //cout<<" \narrayList value at front "<<arrayList.back();
-    pair <string, int>p1;
-    pair <string, string>p2;
-    pair <string, float>p3;
-    pair <int, Student>p4;
-    p1 = make_pair("RajSingh",25);
-    p2 = make_pair("India","New Delhi");
-    p3 = make_pair ("MastringCplusplus", 345.5f);
-    p4 = make_pair (5,s1);
-    cout<<"\n p1 pair value "<<p1.first<<" " <<p1.second;
-    cout<<"\n p4 pair value "<<p4.first;
-    Student s = (p4.second);
-    s.showStudentInfo();
-    tuple<string,int,int>t1;
-    t1 = make_tuple("Tuple",4,6);
-    cout<<"\n Show Tuple = "<<get<1>(t1);
-    vector <int>v1{10,20,30,40,50};
-    vector <string>v2{"Vector1","Vector2"};
-    vector <char>v3 (4,'a');
-    vector <int>v4(5,10);
-    vector <string> v5(3,"Hello");
-    cout<<" \n V 0 = "<<v2[0];
-    cout<<" \n V 1 = "<<v2[1];
-    for (int i =0;i<5;i++)
-        cout<<"\n "<<v1[i];
-    vector <int>v7;
-    cout<<"\n Capaciy v7 = "<<v7.capacity();
-    for(int i=0;i<9;i++)
-    v7.push_back(10*(i+1));
-    v7.pop_back();v7.pop_back();
-    cout<<"\n Capaciy v7 = "<<v7.capacity();
-    cout<<"\n Capaciy total number of elements v7 = "<<v7.size();
-    for(int i=0;i<v7.size();i++)
-        cout<<"\n "<<v7[i];
-    cout<<"\n v7at 3 = "<<v7.at(4);
-    //v7.clear();
-    vector<int>:: iterator it = v7.begin();
-    v7.insert(it+3, 35);
-    for(int i=0;i<v7.size();i++)
-        cout<<"\n "<<v7[i];
+    testSTLArray();
+    testSTLVector();
+    testSTLMap();
+    testSTLList();
 
     testMe objTest;
     mujhePrintKaro();
-    list <int> l1{11,22,33,44,55}; //Can access front to back or back to front
-    list <int>::iterator ptr1 = l1.begin();
-    while (ptr1!=l1.end())
-    {
-        cout<<" " <<*ptr1;
-        ptr1++;
-    }
-    l1.pop_back();
-    list <string>l2 {"Raj","Pragati","Shahsi","Namrta","Ajay","Deepti"};
-    l2.push_back("Noida");
-    l2.push_front("Gurgaon");
-    list <string>::iterator listIt = l2.begin();
-    while (listIt!=l2.end())
-    {
-        cout<<" " <<*listIt;
-        listIt++;
-    }
-    cout<<"\n Total value of l2 = "<<l2.size();
-    //Map Associative arrays its a key value pair and key acn not be altered and in shorted order
-    map <int,string> customer;
-    customer[100]="Rajesh";
-    customer[110]="Vijay";
-    customer[120]="Rajendra";
-    cout<<"\nCustomer name at 100 key value is "<<customer[100];
-    map <int,string> m2 = {
-    {100,"Value1"},
-    {110,"Value2"}
-    };
-    map <int,string>::iterator mapItr = customer.begin();
-    while(mapItr!=customer.end())
-    {
-        cout<<"\n Key "<<mapItr->first<<" Value "<<mapItr->second;
-        mapItr++;
-    };
-    m2.insert(pair<int,string>(120,"Value3"));
-    m2.insert(pair<int,string>(130,"Value4"));
-    cout<<"\n m2 map value inserted is "<<m2[120];
+
 
     //String class handling assign(),append(),insert(),replace(),erase(), find(), rfind(), compare(), c_str(), size()
     char str1[] = {"Hello"};
